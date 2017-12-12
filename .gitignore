@@ -21,3 +21,6 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+*.ipr
+*.iml
+*.iws

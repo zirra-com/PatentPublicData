@@ -3,20 +3,21 @@ package gov.uspto.bulkdata.cli2;
 import java.net.MalformedURLException;
 
 public enum BulkDataType {
-		
-	GAZETTE("data2/patent/officialgazzette/", "zip"),
 
-	GRANT_MULTI_PAGE_IMAGES("data3/patent/grant/multipagetiff/", "zip"),
+	//03/15/2017 NOTE:  The disk space on BDSS is being restructured. URLs/links that contain data2 and data3 will be changing to data.
+	GAZETTE("data/patent/officialgazzette/", "zip"),
+
+	GRANT_MULTI_PAGE_IMAGES("data/patent/grant/multipagetiff/", "zip"),
 	GRANT_SINGLE_PAGE_IMAGES("data/patent/grant/yellowbook/", "tar"),
 	GRANT_REDBOOK_WITH_IMAGES("grant/redbook/", "tar"),
-	GRANT_REDBOOK_TEXT("data2/patent/grant/redbook/fulltext/", "zip"),
-	GRANT_REDBOOK_BIBLIO("data2/patent/grant/redbook/bibliographic/", "zip"),
+	GRANT_REDBOOK_TEXT("data/patent/grant/redbook/fulltext/", "zip"),
+	GRANT_REDBOOK_BIBLIO("data/patent/grant/redbook/bibliographic/", "zip"),
 
-	APPLICATION_MULTI_PAGE_IMAGES("data3/patent/application/multipagetiff/", "zip"),
+	APPLICATION_MULTI_PAGE_IMAGES("data/patent/application/multipagetiff/", "zip"),
 	APPLICATION_SINGLE_PAGE_IMAGES("data/patent/application/yellowbook/", "tar"),
-	APPLICATION_REDBOOK_WITH_IMAGES("data2/patent/application/redbook/", "tar"),
-	APPLICATION_REDBOOK_TEXT("data2/patent/application/redbook/fulltext/", "zip"),
-	APPLICATION_REDBOOK_BIBLIO("data2/patent/grant/redbook/bibliographic/", "zip");
+	APPLICATION_REDBOOK_WITH_IMAGES("data/patent/application/redbook/", "tar"),
+	APPLICATION_REDBOOK_TEXT("data/patent/application/redbook/fulltext/", "zip"),
+	APPLICATION_REDBOOK_BIBLIO("data/patent/grant/redbook/bibliographic/", "zip");
 
 	private static String BASEURL = "https://bulkdata.uspto.gov/";
 	private String restPath;
