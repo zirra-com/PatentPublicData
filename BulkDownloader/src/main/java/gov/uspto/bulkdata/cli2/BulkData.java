@@ -4,12 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -72,8 +67,32 @@ public class BulkData {
         this.scrapper = new PageLinkScraper(client);
         this.downloader = new Downloader(client);
         this.yearMap = yearMap;
-        this.isAsync = isAsync;
+
+        if (this.yearMap.size() == 0) {
+
+            Integer currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            for (Integer yearToAdd = dataType.getStartAvailableYear(); yearToAdd <= currentYear; yearToAdd++) {
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.YEAR, yearToAdd);
+                cal.set(Calendar.DAY_OF_YEAR, 1);
+                Date startDate = cal.getTime();
+
+                //set date to last day
+                cal.set(Calendar.YEAR, yearToAdd);
+                cal.set(Calendar.MONTH, 11); // 11 = december
+                cal.set(Calendar.DAY_OF_MONTH, 31); // new years eve
+
+                Date endDate = cal.getTime();
+
+                this.yearMap.put(String.valueOf(yearToAdd), new DateRange(startDate, endDate));
+            }
+        }
+
+        LOGGER.info("year map: {}", this.yearMap);
         this.yearIterator = yearMap.keySet().iterator();
+
+        this.isAsync = isAsync;
+
     }
 
     /**
@@ -162,9 +181,15 @@ public class BulkData {
             HttpUrl url = HttpUrl.parse(dataType.getURL(year));
             LOGGER.info("URL: {}, Matcher: {}", url, yearMap.get(year));
             List<HttpUrl> yearUrls = scrapper.fetchLinks(url, yearMap.get(year), dataType.getSuffix());
+
+            LOGGER.info("year urls: {} ", yearUrls);
             urls.addAll(yearUrls);
         }
+
+
         return urls;
+
+
     }
 
     public List<HttpUrl> fetchLinks(int skip) throws IOException {
@@ -217,8 +242,7 @@ public class BulkData {
                 accepts("type").withRequiredArg().ofType(String.class)
                         .describedAs("Patent Document Type [grant, application, gazette]").required();
                 accepts("date").withRequiredArg().ofType(String.class)
-                        .describedAs("Single Date Range or list, example: 20150801-20150901,20160501-20160601")
-                        .required();
+                        .describedAs("Single Date Range or list, example: 20150801-20150901,20160501-20160601");
                 accepts("limit").withOptionalArg().ofType(Integer.class).describedAs("download file limit")
                         .defaultsTo(0);
                 accepts("skip").withRequiredArg().ofType(Integer.class).describedAs("skip number of files")
@@ -259,17 +283,19 @@ public class BulkData {
         String dataInpuStr = (String) options.valueOf("date");
 
         ListMultimap<String, DateRange> yearMap = LinkedListMultimap.create();
-        Iterable<String> dateInputList = Splitter.on(",").omitEmptyStrings().trimResults().split(dataInpuStr);
-        for (String dateStr : dateInputList) {
-            List<String> dateInputRange = Splitter.on("-").omitEmptyStrings().trimResults().splitToList(dateStr);
-            if (dateInputRange.size() == 2) {
-                DateRange dateRange = DateRange.parse(dateInputRange.get(0), dateInputRange.get(1),
-                        DateTimeFormatter.BASIC_ISO_DATE);
-                for (Integer year : dateRange.getYearsBetween()) {
-                    yearMap.put(String.valueOf(year), dateRange);
+        if (dataInpuStr != null && !"".equals(dataInpuStr.trim())) {
+            Iterable<String> dateInputList = Splitter.on(",").omitEmptyStrings().trimResults().split(dataInpuStr);
+            for (String dateStr : dateInputList) {
+                List<String> dateInputRange = Splitter.on("-").omitEmptyStrings().trimResults().splitToList(dateStr);
+                if (dateInputRange.size() == 2) {
+                    DateRange dateRange = DateRange.parse(dateInputRange.get(0), dateInputRange.get(1),
+                            DateTimeFormatter.BASIC_ISO_DATE);
+                    for (Integer year : dateRange.getYearsBetween()) {
+                        yearMap.put(String.valueOf(year), dateRange);
+                    }
+                } else {
+                    LOGGER.warn("Invalid DateRange has more than two dashs: {}", dateInputRange);
                 }
-            } else {
-                LOGGER.warn("Invalid DateRange has more than two dashs: {}", dateInputRange);
             }
         }
 

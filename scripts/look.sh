@@ -4,17 +4,17 @@
 # View a Patent Document contained within a Weekly Bulk Download File
 #
 #
-FILE=ipa150101.zip
+FILE=$1
 SKIP=0
 LIMIT=1
-FIELDS=id,title,description,ciations,claims,classification,family
-# FIELDS=xml
+#FIELDS=id,title,description,ciations,claims,classification,family
+FIELDS=xml
 
 
 # ProjectPath is one directory up from script bin directory.
 PROJECTPATH=$( cd $(dirname $0)/.. ; pwd -P )
 
-CLASSPATH="${PROJECTPATH}/lib/*:${PROJECTPATH}/lib/dependency-jars/*"
+CLASSPATH="${PROJECTPATH}/BulkDownloader/target/*:${PROJECTPATH}/BulkDownloader/target/dependency-jars/*"
 
 JAVA="java -cp ${CLASSPATH} -Dlog4j.configuration=file:${PROJECTPATH}/conf/log4j.properties"
 
