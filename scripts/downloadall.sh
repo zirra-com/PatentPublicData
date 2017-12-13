@@ -14,10 +14,11 @@ CLASSPATH="${PROJECTPATH}/BulkDownloader/target/*:${PROJECTPATH}/BulkDownloader/
 echo $CLASSPATH
 JAVA="java -cp ${CLASSPATH} -Dlog4j.configuration=file:${PROJECTPATH}/conf/log4j.properties"
 
-mkdir -p ${PROJECTPATH}/download
+OUTPUTDIR=${PROJECTPATH}/download/$TYPE
+mkdir -p $OUTPUTDIR
 
 #
 # type: [application, grant, gazette]    requited;  patent document type
 # outdir    directory to download to.
 #
-${JAVA} gov.uspto.bulkdata.cli2.BulkData --type $TYPE --outdir="${PROJECTPATH}/download"
+${JAVA} gov.uspto.bulkdata.cli2.BulkData --type $TYPE --outdir="$OUTPUTDIR"

@@ -77,8 +77,13 @@ public class Downloader {
 	}
 
 	public boolean download(DownloadFile download) throws IOException{
-		
+		  if (download.getOutFile().exists()) {
+		  	LOGGER.info("Downloading: File {} already downloaded", download.getOutFile());
+		  	return true;
+		  }
+
 		  LOGGER.info("Downloading: {} - {}", download.getOutFile(), download.getTempFile());
+
 
 		  Request request = new Request.Builder().url(download.getUrl()).build();
 
