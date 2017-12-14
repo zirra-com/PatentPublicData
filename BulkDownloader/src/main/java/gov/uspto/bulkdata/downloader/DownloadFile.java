@@ -63,13 +63,44 @@ public class DownloadFile implements Serializable {
 	
 		String filename = getFilename(url);
 		String urlHash = getUrlHash(url);
-		
+
+		String subDir = getSubDirectory(url);
+
+		if (!"".equals(subDir)) {
+			filename = subDir + "/" + filename;
+			urlHash = subDir + "/" + urlHash;
+
+			Path subDirPath = downloadDir.resolve(subDir);
+
+
+			if (Files.exists(subDirPath)) {
+				if (!Files.isDirectory(subDirPath)) {
+					Files.delete(subDirPath);
+
+					Files.createDirectory(subDirPath);
+				}
+			} else {
+				Files.createDirectory(subDirPath);
+			}
+		}
+
 		this.outFile = downloadDir.resolve(filename);
 		this.tempFile = downloadDir.resolve(urlHash + ".tmp");
 
 		//this.outFile = new File(downloadDir.toString(), filename);
 		//this.tempFile = new File(downloadDir.toString(),  urlHash + ".tmp");
 		//this.tempFile = File.createTempFile(urlHash, ".tmp");
+	}
+
+	private String getSubDirectory(HttpUrl url){
+		List<String> pathSegments = url.encodedPathSegments();
+
+		String yearDir = "";
+		if (pathSegments.size() > 1) {
+			yearDir = pathSegments.get(pathSegments.size() - 2);
+		}
+
+		return yearDir;
 	}
 
 	private String getFilename(HttpUrl url){
